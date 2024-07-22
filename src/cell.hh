@@ -128,6 +128,40 @@ class voronoicell_base {
 			fclose(fp);
 		}
 		double volume();
+		template <typename Fn>
+		inline double volume2(Fn fn) {
+			const double fe=1/48.0;
+			double vol=0;
+			int i,j,k,l,m,n;
+			double ux,uy,uz,vx,vy,vz,wx,wy,wz;
+			for(i=1;i<p;i++) {
+				ux=*pts-pts[i<<2];
+				uy=pts[1]-pts[(i<<2)+1];
+				uz=pts[2]-pts[(i<<2)+2];
+				for(j=0;j<nu[i];j++) {
+					k=ed[i][j];
+					if(k>=0) {
+						ed[i][j]=-1-k;
+						l=cycle_up(ed[i][nu[i]+j],k);
+						vx=pts[k<<2]-*pts;
+						vy=pts[(k<<2)+1]-pts[1];
+						vz=pts[(k<<2)+2]-pts[2];
+						m=ed[k][l];ed[k][l]=-1-m;
+						while(m!=i) {
+							n=cycle_up(ed[k][nu[k]+l],m);
+							wx=pts[(m<<2)]-*pts;
+							wy=pts[(m<<2)+1]-pts[1];
+							wz=pts[(m<<2)+2]-pts[2];
+							vol+=fn(ux, uy, uz, vx, vy, vz, wx, wy, wz);
+							k=m;l=n;vx=wx;vy=wy;vz=wz;
+							m=ed[k][l];ed[k][l]=-1-m;
+						}
+					}
+				}
+			}
+			reset_edges();
+			return vol*fe;
+		}
 		double max_radius_squared();
 		double total_edge_distance();
 		double surface_area();
