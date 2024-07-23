@@ -128,8 +128,8 @@ class voronoicell_base {
 			fclose(fp);
 		}
 		double volume();
-		template <typename Fn>
-		inline double volume2(Fn fn) {
+		template <typename Fn, typename Ctx>
+		inline double volume2(Fn fn, Ctx context) {
 			const double fe=1/48.0;
 			double vol=0;
 			int i,j,k,l,m,n;
@@ -152,7 +152,7 @@ class voronoicell_base {
 							wx=pts[(m<<2)]-*pts;
 							wy=pts[(m<<2)+1]-pts[1];
 							wz=pts[(m<<2)+2]-pts[2];
-							vol+=fn(ux, uy, uz, vx, vy, vz, wx, wy, wz);
+							vol+=fn(context, ux, uy, uz, vx, vy, vz, wx, wy, wz);
 							k=m;l=n;vx=wx;vy=wy;vz=wz;
 							m=ed[k][l];ed[k][l]=-1-m;
 						}
